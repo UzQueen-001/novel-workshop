@@ -1,0 +1,20 @@
+{
+  "name": "novel-local",
+  "interface": {
+    "displayName": "小说工坊（本地）"
+  },
+  "plugins": [
+    {
+      "name": "novel-workshop",
+      "source": {
+        "source": "local",
+        "path": "./plugins/novel-workshop"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

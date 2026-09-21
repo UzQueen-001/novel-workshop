@@ -1,0 +1,18 @@
+{
+  "name": "novel-workshop",
+  "version": "0.1.0",
+  "description": "引导式小说创作工坊：工作目录搭建、设定采集、章节骨架设计与两条并行的正文生成线。",
+  "author": {
+    "name": "UzQueen-001"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "小说工坊",
+    "shortDescription": "引导式小说创作工作流",
+    "longDescription": "从安顿工作目录开始（装了 Obsidian 就用库，没装就是普通文件夹，不提），用启发式提问采集世界观与人物，经筹备工作流建立台账与参照书目，再由升维解剖产出章节骨架，交给升维生成与降维生成两条并行线写出正文。",
+    "developerName": "UzQueen-001",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "帮我从头开一本新小说"
+  }
+}
