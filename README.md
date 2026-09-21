@@ -74,6 +74,8 @@ codex plugin add novel-workshop@novel-local
 - 项目地址：https://github.com/larashero3-dotcom/lieflat-less-ai-tone
 - 本插件的规则表在其结论基础上重写，并结合骨架／软骨／血肉结构做了取舍。倍率、脚本与完整反例以原项目为准。
 
+本仓库以 MIT License 发布，Copyright (c) 2026 UzQueen-001，见 [LICENSE](LICENSE)。
+
 ---
 
 # Novel Workshop (English)
@@ -151,3 +153,5 @@ The rules in `novel-deai` are based on the open corpus study **lieflat-less-ai-t
 
 - Repository: https://github.com/larashero3-dotcom/lieflat-less-ai-tone
 - This plugin rewrites those findings for its skeleton/cartilage/flesh structure. For ratios, scripts, and full counter-examples, refer to the original project.
+
+This repository is released under the MIT License, Copyright (c) 2026 UzQueen-001. See [LICENSE](LICENSE).
