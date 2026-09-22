@@ -4,6 +4,16 @@
 
 它不是一键生成器。设定靠提问问出来，骨架靠作者点头定下来，正文由两条互不相干的线各写一版，拆开重组、逐段投票，拼出终稿。
 
+## 主要内容：降维法
+
+这个插件真正的主体是**降维生成（拍摄生成法）**。升维线是参照组：它按标准流程直接从骨架写正文；降维线则把一章折成剧本形态，再一级一级拍回成正文——
+
+对白剧本（只有对话，不限字数）→ 主剧本（加动作与行为）→ 场景化剧本（加布景与运镜）→ 定原文（去括号、补环境与细节描写）→ 成文（只调词汇与语序，不再增删内容）。
+
+每一道工序之间都要做一次逻辑与设定校准。
+
+**工作原理**：DeepSeek 写剧本的能力比较强。把一章拆成「谁说什么、谁做什么」的剧本形态，等于先把这一章交给模型最擅长的表达方式，再一级一级升回小说。这是作者的经验判断，不是跑分结论——换模型时值得自己复测一遍。
+
 ## 为什么这样写
 
 **骨架是硬边界。** 一章先拆成骨架（事件）、软骨（过渡）、血肉（描写）。两条生成线只许给骨架加厚度，不许长出骨架外的事件、人物、设定、情报。抽掉描写和维度之后，正文里剩下的骨架必须和原骨架一模一样。
@@ -87,6 +97,16 @@ codex plugin add novel-workshop@novel-local
 A Codex plugin that breaks novel writing into steps you can actually inspect.
 
 It is not a one-click generator. The setting is drawn out by questioning, the chapter skeleton is confirmed by the author, and the prose is written twice by two independent pipelines, then taken apart, recombined, and voted on segment by segment.
+
+## The core: the descend method
+
+The real subject of this plugin is the **descend pipeline (filming-style generation)**. The ascend pipeline is the control group: it writes prose straight from the skeleton. The descend pipeline folds a chapter into script form first, then films it back into prose step by step —
+
+dialogue script (dialogue only, any length) → action script (add actions and behaviour) → staged script (add sets and camera movement) → draft (drop the brackets, add environment and detail) → final wording (adjust vocabulary and word order only, no additions or deletions).
+
+Each step is followed by a logic and continuity calibration.
+
+**How it works**: DeepSeek is notably strong at writing scripts. Folding a chapter into "who says what, who does what" hands it to the model in the form it handles best, then walks it back up to prose. This is the author's practical observation, not a benchmark result — re-test it yourself when you switch models.
 
 ## Why it works this way
 
