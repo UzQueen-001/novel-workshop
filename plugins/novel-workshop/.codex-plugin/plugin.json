@@ -1,6 +1,6 @@
 {
   "name": "novel-workshop",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "引导式小说创作工坊：工作目录搭建、设定采集、章节骨架设计与两条并行的正文生成线。",
   "author": {
     "name": "UzQueen-001"

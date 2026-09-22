@@ -2,7 +2,7 @@
 
 面向长篇创作的 Codex 插件。以结构化片段为最小比较单位，通过双管线独立生成、交叉重组与盲评加权投票，逐章收敛出终稿。
 
-版本 0.1.4 ｜ 许可 MIT ｜ 市场来源 `UzQueen-001/novel-workshop`
+版本 0.1.5 ｜ 许可 MIT ｜ 市场来源 `UzQueen-001/novel-workshop`
 
 ## 概述
 
@@ -89,6 +89,8 @@ codex plugin add novel-workshop@novel-local
 
 已有设定与人物时，可从筹备工作流介入；已有大纲、需要推进某一章时，从升维解剖介入；只想清理某段文字的 AI 痕迹时，单独调用判定与改写技能。
 
+开场不是必须当场作答的选择题：看完介绍再提写作要求即可，插件按你下一条消息的内容决定入口。技能库的改动对之后的输入生效。
+
 ## 工作区结构
 
 工作区内的全部文件均为 `.txt`。正文单章数千字，叠加解剖稿与台账后，Markdown 渲染会造成明显卡顿；纯文本在打开与检索上开销更低。技能清单文件为 `.md`，由平台规范决定。
@@ -134,7 +136,7 @@ Obsidian 为可选。仅在检测到本机已安装时询问是否以其建立�
 
 A Codex plugin for long-form fiction. Structured segments serve as the minimum unit of comparison; two independent drafting pipelines, cross-recombination, and weighted blind review converge each chapter into a final text.
 
-Version 0.1.4 ｜ License MIT ｜ Marketplace source `UzQueen-001/novel-workshop`
+Version 0.1.5 ｜ License MIT ｜ Marketplace source `UzQueen-001/novel-workshop`
 
 ## Overview
 
@@ -220,6 +222,8 @@ codex plugin add novel-workshop@novel-local
 Simply invoke the plugin — no input preparation required. It introduces the workflow and its approval points, then asks where to begin.
 
 With existing setting and characters, enter at the preparation stage; with an outline and a chapter to advance, enter at anatomy; to clean AI tells from existing text, invoke the judge and rewriter skills directly.
+
+The opening is not a question you must answer on the spot: state your writing requirement after reading the introduction, and the plugin routes by the content of your next message. Changes to the skill library apply to subsequent input.
 
 ## Workspace Layout
 
