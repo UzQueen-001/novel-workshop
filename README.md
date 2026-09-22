@@ -57,13 +57,17 @@ codex plugin add novel-workshop@novel-local
 | `novel-dissect` | 拆解：把成品拆回骨架、软骨、血肉 |
 | `novel-vote` | 多 Agent 多维投票与评分台账 |
 | `novel-logic` | 逻辑审查：四类互搏与六项必查 |
-| `novel-deai` | 去 AI 味：白名单改写，信息守恒 |
+| `novel-ai-judge` | AI 痕迹判定 agent：一人一特征，只判不改 |
+| `novel-deai` | 去 AI 味改写 agent：按命中清单改，一次只改一个特征 |
+| `novel-panel` | 评审团编制：每个 agent 的角色、输入输出与互盲规则 |
 | `novel-closeout` | 章后收尾：回填台账、汇总评分 |
 | `novel-pipeline` | 整体工作流编排 |
 
 ## 几条值得先知道的规则
 
 - **不装 Obsidian 就一个字都不提。** 检测到才问一句要不要用；没有的话直接按普通文件夹走，全流程只依赖纯 Markdown。
+- **库里写出来的一切都是 `.txt`。** 正文一章几千字，加上解剖稿和台账，Markdown 渲染会卡死；纯文本打开快、搜得也快。
+- **一个 agent 只干一件事。** 判定与改写分开，判定按十一种特征派十一名 agent，改写一位只改一个特征，评审按八个维度派十六名，全程互盲。编制见 `novel-panel`。
 - **需要你点头的地方**：动文件、联网、建库、每一层设定、骨架确认、不可逆情节报备。
 - **去 AI 味只动血肉与软骨**，骨架段不参与改写；未命中规则的句子逐字保留，信息不增不减。
 
@@ -137,13 +141,17 @@ Opening
 | `novel-dissect` | Dissect a finished chapter back into skeleton, cartilage, flesh |
 | `novel-vote` | Blind multi-agent weighted voting and the score ledger |
 | `novel-logic` | Logic audit: four contradiction classes plus six mandatory checks |
-| `novel-deai` | De-AI-tone: whitelist rewriting with information preservation |
+| `novel-ai-judge` | AI-tell judge agent: one agent, one feature, judges only |
+| `novel-deai` | De-AI-tone rewriter: fixes what the judge found, one feature at a time |
+| `novel-panel` | Panel roster: each agent's role, inputs, outputs, and blind rules |
 | `novel-closeout` | Chapter close-out: update ledgers and scores |
 | `novel-pipeline` | Overall orchestration |
 
 ## A few rules worth knowing up front
 
 - **If Obsidian is not installed, it is never mentioned.** The plugin only asks once if it detects Obsidian. Otherwise everything runs on plain Markdown files.
+- **Everything written into the workspace is `.txt`.** A chapter runs thousands of characters; with dissection drafts and ledgers on top, Markdown rendering stalls. Plain text opens and searches fast.
+- **One agent, one job.** Judging is separated from rewriting: eleven judge agents, one per feature, then rewriters that each handle a single feature; sixteen reviewers, two per dimension, all blind. See `novel-panel` for the roster.
 - **Where your approval is required**: touching files, network access, creating the workspace, every layer of setting, skeleton confirmation, and any irreversible plot move.
 - **De-AI-tone touches only flesh and cartilage.** Skeleton segments are never rewritten; unmatched sentences are preserved word for word, and no information is added or removed.
 
