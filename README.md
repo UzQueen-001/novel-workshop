@@ -2,6 +2,11 @@
 
 面向长篇创作的 Codex 插件集。
 
+一句话：**一台由作者掌闸的自动生成系统。**
+生成全自动——排骨架、写正文、跑模块检查、渲染总览、回填台账与游标，都不用作者动手；
+判断权留在人手上——设定与骨架要作者点头，章节由作者切，这一轮写多长由作者发话，不可逆的情节动笔前先报备。
+它不是黑箱，也不是只给建议的助手：它能一路写下去，但每一个会改变作品的岔路口都停给人。
+
 长篇的难处不在单章写得好看，而在连续几十章之后设定不崩、人物不走形、节奏不塌。
 本仓库提供的两个插件，都在处理同一件事：**把不可复盘的成稿，换成可检查、可追溯的工序。**
 
@@ -25,7 +30,23 @@
 把一部长篇拆成骨架、角色、线索、场景、关系、世界观几个模块，每个模块由大量小块（积木）组成，**一块一个文件**。
 写作时只加载当前用得着的那几块——这是为长上下文设计的：不靠模型记住整本书，靠文件把该记的事记在外面。
 
-它不做一键生成：设定靠问，骨架靠作者点头，正文照骨架持续写。
+它不做黑箱：**生成是自动的，判断不是。** 设定靠问，骨架靠作者点头，正文照骨架持续写。
+
+## 自动化到什么程度
+
+| 环节 | 谁做 |
+| --- | --- |
+| 排骨架（含节奏评分、线索落点、影响面分流） | 自动 |
+| 写正文（照骨架持续生成） | 自动 |
+| 跑模块检查、出报警 | 自动 |
+| 渲染骨架总览、回填台账与游标 | 自动 |
+| 点头：设定与骨架 | **作者** |
+| 划章 | **作者** |
+| 发话这一轮写多少（如「继续写 3000 字」） | **作者** |
+| 批不可逆情节（死亡、黑化、势力覆灭） | **作者** |
+
+**还差的一环是循环控制。** 什么时候该继续写、什么时候该停、什么时候该发现写不通了回退到某个块——
+这三件事目前仍由作者判断并发令。要让循环自己转，先得定下这套判断交给谁、出错时报警给谁。
 
 ## 核心设计
 
@@ -98,6 +119,7 @@ node scripts/init-project.mjs <项目目录>    # 新建一个空项目骨架
 - 规范与渲染器已定稿并跑通，**尚未用一部长篇做过端到端实跑**。
 - 检查器目前是写死的判定清单与输出格式，由 agent 按流程执行，**不是可独立运行的脚本**。
 - 绝对时间依赖世界观模块里定的纪年法；渲染排序暂用一个数字「时间位」，纪年法固定后可由时间字符串直接推导。
+- **循环控制未设计**：继续、暂停、回退这三件事现在由作者发令，自动化尚未闭环。
 
 ---
 
@@ -238,6 +260,11 @@ codex plugin add novel-blocks@novel-local
 
 A collection of Codex plugins for long-form fiction.
 
+In one line: **an automatic generation system with the author on the gates.**
+Generation is automatic — laying out the skeleton, writing prose, running the module checkers, rendering the overview, updating ledgers and cursors.
+Judgement stays with the author — setting and skeleton need a nod, chapters are cut by the author, how much to write this round is the author's call, and irreversible plot moves are cleared beforehand.
+It is neither a black box nor an advisor: it will keep writing, but every fork that changes the work stops for a human.
+
 The hard part of a long novel is not one good chapter — it is keeping setting, characters and pacing intact across dozens of them. Both plugins here address the same problem: **replacing an un-auditable finished draft with steps that can be inspected and traced.**
 
 License MIT ｜ Marketplace source `UzQueen-001/novel-workshop`
@@ -259,7 +286,22 @@ The two do not share a data format. Use `novel-blocks` for new projects; project
 
 A novel is decomposed into modules — skeleton, characters, threads, locations, relationships, world — and each module is a cluster of small blocks, **one file per block**. Only the blocks currently in use are loaded. This is a design for long context: the model is not asked to remember the whole book; the files remember it.
 
-It is not a one-click generator: the setting is captured by questioning, the skeleton is confirmed by the author, and the prose is written continuously against the skeleton.
+It is not a black box: **generation is automatic, judgement is not.** The setting is captured by questioning, the skeleton is confirmed by the author, and the prose is written continuously against the skeleton.
+
+## How automated
+
+| Step | Who |
+| --- | --- |
+| Skeleton layout (rhythm scoring, thread landings, impact routing) | automatic |
+| Prose (continuous generation against the skeleton) | automatic |
+| Module checkers and alerts | automatic |
+| Skeleton overview rendering, ledger and cursor updates | automatic |
+| Approving setting and skeleton | **author** |
+| Cutting chapters | **author** |
+| How much to write this round (e.g. "write another 3,000") | **author** |
+| Clearing irreversible plot moves | **author** |
+
+**Loop control is the missing piece.** When to continue, when to stop, and when to fall back after hitting a dead end are still the author's calls. Closing that loop first requires deciding who makes those calls and who gets alerted when something goes wrong.
 
 ## Design
 
@@ -309,6 +351,7 @@ The renderer never writes back: content is edited in the files, and the diagram 
 - Specification and renderer are settled and working; **not yet exercised end-to-end on a full novel**.
 - Checkers are currently a written rubric and output format executed by the agent, **not standalone scripts**.
 - Absolute time depends on the calendar defined by the world module; ordering currently uses a numeric time key.
+- **Loop control is undesigned**: continue, pause and roll back are author commands today, so automation does not yet close the loop.
 
 ---
 
