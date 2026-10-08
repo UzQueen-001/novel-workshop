@@ -1,14 +1,110 @@
 # 小说工坊 · Novel Workshop
 
-面向长篇创作的 Codex 插件。以结构化片段为最小比较单位，通过双管线独立生成、交叉重组与盲评加权投票，逐章收敛出终稿。
+面向长篇创作的 Codex 插件集。
 
-版本 0.1.5 ｜ 许可 MIT ｜ 市场来源 `UzQueen-001/novel-workshop`
+长篇的难处不在单章写得好看，而在连续几十章之后设定不崩、人物不走形、节奏不塌。
+本仓库提供的两个插件，都在处理同一件事：**把不可复盘的成稿，换成可检查、可追溯的工序。**
+
+许可 MIT ｜ 市场来源 `UzQueen-001/novel-workshop`
+
+## 插件一览
+
+| 插件 | 状态 | 定位 |
+| --- | --- | --- |
+| [`novel-blocks`](plugins/novel-blocks) | **当前主线** | 模块化写作：一条写作顺序的骨架、一块一个文件的档案、每个模块配检查器 |
+| [`novel-workshop`](plugins/novel-workshop) | 早期版本 | 双管线独立生成、交叉重组、盲评加权投票，逐章收敛出终稿 |
+
+两者不共用数据格式。新项目用 `novel-blocks`；已经在 `novel-workshop` 体系里开写的项目可以按原法收尾。
+
+---
+
+# 一、novel-blocks · 模块化写作
 
 ## 概述
 
-长篇创作的困难不在单章写得好看，而在连续几十章之后设定不崩、人物不走形、节奏不塌。本插件把一章拆成可独立比较、可回溯、可评分的工序，让每一步的产物都能被检查，而不是只留下一份无法复盘的成稿。
+把一部长篇拆成骨架、角色、线索、场景、关系、世界观几个模块，每个模块由大量小块（积木）组成，**一块一个文件**。
+写作时只加载当前用得着的那几块——这是为长上下文设计的：不靠模型记住整本书，靠文件把该记的事记在外面。
 
-它不做一键生成：设定由提问采集，骨架经作者确认，正文由两条互不相干的管线各写一版，再拆解、交换、逐段投票。
+它不做一键生成：设定靠问，骨架靠作者点头，正文照骨架持续写。
+
+## 核心设计
+
+**骨架是一条写作顺序的直线。** 块按 `B01`、`B02`、`B03` 一路往下排，编号本身就是写作顺序。
+线（视角）只是块上的一个字段：换线＝换一双眼睛，回到过去＝这一块去写更早的时间，
+两者都**不改变**写作顺序这件事，也不允许摆成并排的泳道。
+这条是硬规则——同时发生的事一旦排成两条并排轨道，下一块该写哪里就分不清了。
+
+**一块一个文件。** 设定、骨架、台账一律 `.md`，一块一个小文件，一个模块就是一个文件集群，避免长文档的打开与检索开销；小说正文一律 `.txt`。
+
+**角色门禁。** 新角色必须先立卡才能进剧情。正式角色六块必填——名字、定位、来历、能力或手段、底线、当前目标；
+无名角色五块以内、登记不立卡，一旦第二次出现或被点名，必须升级为正式角色。
+
+**线索一入一出。** 线索诞生的那一刻，它的落点、以及落点前后各一块，必须已经存在于骨架里。
+出口没规划出来的线索不允许存在——这条规则把「以后再说」从流程里删掉了。落点在很远处时打 `🕳远端` 标记。
+
+**因果链接改写。** 改角色不是改文字，而是在某个骨架块上挂一个因果节点，声明某项属性自此改变。
+角色的每个字段因此是「基础值＋变更链」，检查器按块取当时生效的那一版。
+改写**不得落在已经写完的正文里**——撞上已写区域时停下来问作者，否则已写出的字与检查结果会对不上。
+
+**节奏评分决定字数。** 每块打三个分：内容重要性、情绪塑造（紧张／平缓／悲伤／快乐）、与前后块的咬合，
+加权后映射到 10–1000 字。骨架一边往前排，一边算这段的预估字数。
+
+**＋20k 前瞻。** 写作位置之后的块，预估字数累计 ≥ 20000 才允许动笔。只能多，不能少；
+为一条精妙的伏笔提前把某段做长做细，正是允许的用法。
+
+**模块检查器。** 每个模块配一个独立检查器：角色查 OOC 与认知越界，世界观查硬规则与术语口径，
+线索查有入无出，场景查空间描述是否打架，关系查状态是否与记录不符。填完一段血肉就跑一遍。
+需要说明的是，检查器**只能发现「和记录冲突」，发现不了「记录里根本没写」**——它的有效性上限就是台账的完整度。
+
+## 骨架渲染
+
+插件带一个只读渲染脚本，把项目渲染成单文件 HTML 总览：**行＝线**，横轴两选一——
+「按写作顺序」看顺序与换线，「按故事时间」看回到过去的块往左挪。
+方块宽度正比于预估字数，所以图上的疏密就是节奏；每条线索画成一条弧线，
+**弧线中点的小方块可以点开那条线索**，方块本身点开就是对应的 md。
+
+```sh
+node scripts/viz.mjs <项目目录> [--open]   # 输出 <项目目录>/骨架总览.html
+node scripts/init-project.mjs <项目目录>    # 新建一个空项目骨架
+```
+
+渲染器从不写回任何文件：改内容永远改 md，图只是读出来的。
+
+## 目录结构
+
+```text
+《项目名》/
+├── 骨架/     线索引.md、写作顺序.md、块/B01_*.md
+├── 角色/     <名字>/{卡.md, 积木/, 认知边界.md, 变更/}
+├── 场景/     地点索引.md、<地点>.md
+├── 关系/     <A>_对_<B>.md      A 对 B 与 B 对 A 各存一条，不合并
+├── 线索/     C01_*.md
+├── 世界观/   规则/、术语表.md、禁忌.md、待解决问题.md
+├── 正文/     第01章.txt
+└── _检索/    作者决定.md、待办队列.md
+```
+
+## 技能与脚本
+
+| 名称 | 职责 |
+| --- | --- |
+| `novel-blocks` | 唯一入口。铁律、写作循环、检查触发点，按需路由到下面的参考文档 |
+| `references/` | 十个模块规范：骨架、角色、线索、场景、关系、世界观、检查、可视化、命名、总纲 |
+| `scripts/viz.mjs` | 骨架渲染 |
+| `scripts/init-project.mjs` | 新建项目骨架 |
+
+## 状态与限制
+
+- 规范与渲染器已定稿并跑通，**尚未用一部长篇做过端到端实跑**。
+- 检查器目前是写死的判定清单与输出格式，由 agent 按流程执行，**不是可独立运行的脚本**。
+- 绝对时间依赖世界观模块里定的纪年法；渲染排序暂用一个数字「时间位」，纪年法固定后可由时间字符串直接推导。
+
+---
+
+# 二、novel-workshop · 双管线生成（早期版本）
+
+以结构化片段为最小比较单位，通过双管线独立生成、交叉重组与盲评加权投票，逐章收敛出终稿。
+版本 0.1.5，保留用于已在旧体系里开写的项目。
 
 ## 核心机制
 
@@ -66,30 +162,7 @@
 | `novel-closeout` | 章后收尾：回填台账、汇总评分 |
 | `novel-panel` | 评审团编制：各 agent 的角色、输入输出与互盲规则 |
 | `novel-pipeline` | 整体工序编排 |
-
-## 安装
-
-从 Git 市场安装：
-
-```sh
-codex plugin marketplace add UzQueen-001/novel-workshop
-codex plugin add novel-workshop@novel-local
-```
-
-从本地路径安装：
-
-```sh
-codex plugin marketplace add /path/to/novel-workshop
-codex plugin add novel-workshop@novel-local
-```
-
-## 快速开始
-
-直接唤起插件即可，无需准备输入：插件会先介绍工作流与需要授权的环节，再询问从哪一步开始。
-
-已有设定与人物时，可从筹备工作流介入；已有大纲、需要推进某一章时，从升维解剖介入；只想清理某段文字的 AI 痕迹时，单独调用判定与改写技能。
-
-开场不是必须当场作答的选择题：看完介绍再提写作要求即可，插件按你下一条消息的内容决定入口。技能库的改动对之后的输入生效。
+| `novel-taboo` | 写作禁忌：把作者不能碰的线落成硬约束 |
 
 ## 工作区结构
 
@@ -121,7 +194,36 @@ Obsidian 为可选。仅在检测到本机已安装时询问是否以其建立�
 - 两条管线当前串行执行。串行仅为资源考量，两轮输入与规则不变，执行顺序不影响可比性。
 - 上游规则清单中，AI 痕迹特征的实测数据来自第三方语料研究，本仓库未独立复现。
 
-## 第三方与许可
+---
+
+# 安装
+
+从 Git 市场安装：
+
+```sh
+codex plugin marketplace add UzQueen-001/novel-workshop
+codex plugin add novel-blocks@novel-local      # 主线
+codex plugin add novel-workshop@novel-local    # 早期版本，按需
+```
+
+从本地路径安装：
+
+```sh
+codex plugin marketplace add /path/to/novel-workshop
+codex plugin add novel-blocks@novel-local
+```
+
+# 仓库结构
+
+```text
+.
+├── .agents/plugins/marketplace.json   市场定义（市场名 novel-local）
+├── plugins/novel-blocks/              主线插件：skills/ references/ scripts/
+├── plugins/novel-workshop/            早期插件：skills/
+└── LICENSE
+```
+
+# 第三方与许可
 
 `novel-ai-judge` 与 `novel-deai` 使用的规则形态与实测结论取自公开语料研究项目 **lieflat-less-ai-tone**（作者 larashero3-dotcom），MIT License，Copyright (c) 2026 shiujan。该项目以 5 个模型 300 篇 AI 文本（117.9 万汉字）对照 329 篇人类文章（164.8 万汉字），逐条给出倍率、被推翻的预设与测量脚本。
 
@@ -134,128 +236,122 @@ Obsidian 为可选。仅在检测到本机已安装时询问是否以其建立�
 
 # Novel Workshop
 
-A Codex plugin for long-form fiction. Structured segments serve as the minimum unit of comparison; two independent drafting pipelines, cross-recombination, and weighted blind review converge each chapter into a final text.
+A collection of Codex plugins for long-form fiction.
 
-Version 0.1.5 ｜ License MIT ｜ Marketplace source `UzQueen-001/novel-workshop`
+The hard part of a long novel is not one good chapter — it is keeping setting, characters and pacing intact across dozens of them. Both plugins here address the same problem: **replacing an un-auditable finished draft with steps that can be inspected and traced.**
+
+License MIT ｜ Marketplace source `UzQueen-001/novel-workshop`
+
+## Plugins
+
+| Plugin | Status | Purpose |
+| --- | --- | --- |
+| [`novel-blocks`](plugins/novel-blocks) | **Current** | Module-based writing: one writing-order skeleton, one file per block, a checker per module |
+| [`novel-workshop`](plugins/novel-workshop) | Legacy | Two independent drafting pipelines, cross-recombination, weighted blind review |
+
+The two do not share a data format. Use `novel-blocks` for new projects; projects already written under `novel-workshop` can be finished with the original method.
+
+---
+
+# 1. novel-blocks
 
 ## Overview
 
-The hard part of long-form fiction is not writing one good chapter — it is keeping the setting, characters and pacing intact across dozens of them. This plugin decomposes a chapter into steps that can be inspected, traced and scored, so every artifact is checkable instead of leaving behind a single draft that cannot be audited.
+A novel is decomposed into modules — skeleton, characters, threads, locations, relationships, world — and each module is a cluster of small blocks, **one file per block**. Only the blocks currently in use are loaded. This is a design for long context: the model is not asked to remember the whole book; the files remember it.
 
-It is not a one-click generator: the setting is captured by questioning, the skeleton is confirmed by the author, and the prose is written twice by two independent pipelines before being dissected, exchanged and voted on segment by segment.
+It is not a one-click generator: the setting is captured by questioning, the skeleton is confirmed by the author, and the prose is written continuously against the skeleton.
 
-## Core Mechanism
+## Design
 
-**Three segment types.** Chapter content is decomposed into skeleton (events), cartilage (transitions between nodes) and flesh (setting, action, detail, psychology). The three are never merged; voting and assembly are performed per type.
+**The skeleton is a single writing-order line.** Blocks run `B01`, `B02`, `B03` — the number *is* the writing order. POV ("line") is just a field on a block: switching POV swaps whose eyes you borrow, and going back in time means this block narrates an earlier moment. Neither changes the writing order, and simultaneous events are **never** drawn as parallel lanes — once they are, the next block to write becomes ambiguous.
 
-**The skeleton is a hard boundary.** Both pipelines may only add thickness to the skeleton, never events, characters, locations, settings or information outside it. Test: strip every description and dimension — the event sequence must match the skeleton node for node.
+**One file per block.** Setting, skeleton and ledgers are `.md`, one small file per block, so a module is a file cluster rather than a document that stalls on open; finished prose is `.txt`.
 
-**Two independent pipelines.** The ascending pipeline expands prose directly from the skeleton, layering space, character, relationship and language. The descending pipeline converts the chapter into script form and then progressively restores it to prose. Neither reads the other's text while running.
+**Character gate.** A new character must be fully created before entering the plot. A formal character needs six required blocks — name, role, origin, ability or method, limits, current goal. A nameless walk-on gets at most five and is not carded; the moment it appears twice or is named, it must be upgraded.
 
-**Cross-recombination.** Both drafts are dissected and their skeletons exchanged, producing four versions. Aligned by segment type, each type yields four candidates.
+**Threads are one-in, one-out.** The moment a thread is created, its landing point and the blocks immediately before and after it must already exist in the skeleton. A thread whose exit is unplanned is not allowed to exist — the rule removes "we'll figure it out later" from the process. Far-off landings are tagged `🕳`.
 
-**Weighted blind review.** Candidates are stripped of source labels and shuffled before blind reviewers score them across eight dimensions. Weighted totals select the best segment of each type, assembled into a stitched draft that is re-injected into both pipelines and decided by a second vote.
+**Rewrites are causal links.** Changing a character is not editing text: it attaches a causal node to a skeleton block declaring that a trait changes from there on. Every field is therefore "base value + change chain", and checkers read the value in effect at that block. A rewrite **may not land inside already-written prose** — when it would, stop and ask the author.
 
-**Score ledger.** Dimension scores and weighted totals for each pipeline at each step are recorded, enabling cross-chapter comparison, pipeline benchmarking and regression checks.
+**Rhythm scoring sets length.** Each block is scored on importance, emotional register and how tightly it interlocks with its neighbours; the weighted score maps to 10–1000 characters. The skeleton is scored as it is laid out.
 
-## Pipeline Architecture
+**The +20k look-ahead.** Blocks after the writing position must total at least 20,000 estimated characters before drafting continues. More is allowed — deliberately lengthening a stretch to plant a foreshadow is the intended use.
 
-```text
-Opening
-  └─ Onboarding → Preparation → Anatomy (spine → juvenile skeleton → rhythm test → mature skeleton)
-        ↓
-   Mature skeleton ─┬→ Ascending pipeline → Product 1 ─┐
-                    └→ Descending pipeline → Product 2 ─┤
-                                                        ├→ Calibration (boundary / taboo / continuity)
-                                                        ↓
-                                    Cross-recombination: dissect 2 into 1 = Product 3, dissect 1 into 2 = Product 4
-                                                        ↓
-                                    Calibration → Four dissections → per-segment weighted blind review
-                                                        ↓
-                                                  Stitched draft
-                                                        ↓
-                              Re-inject into both pipelines → second vote → final text → close-out
-```
+**A checker per module.** Characters (OOC, knowledge boundary), world (hard rules, terminology), threads (dangling exits), locations (contradictory geography), relationships (state drift). They run after each prose pass. Note the ceiling: a checker can only find **conflicts with what is recorded** — never **what was never recorded**.
 
-The descending pipeline is the main body, in five steps: dialogue script (dialogue only, any length) → action script (add actions and behaviour) → staged script (add sets and camera movement) → draft (drop the brackets, add environment and detail) → final wording (adjust vocabulary and word order only). A logic and continuity calibration runs between consecutive steps.
+## Skeleton rendering
 
-Design premise: scripted expression sits closer to the model's strengths. The author's practical observation is that DeepSeek performs well at script writing, hence the conversion of a chapter into script form before restoring it to prose. This is an empirical judgement, not a benchmark result; re-test when switching models.
-
-## Skills
-
-| Skill | Responsibility |
-| --- | --- |
-| `novel-start` | Opening: introduces the workflow and approval points |
-| `novel-onboarding` | Guided capture of setting; creates the workspace |
-| `novel-prep` | Ledgers, logical links, reference works, style sample |
-| `novel-anatomy` | Anatomy (2ex): spine → juvenile skeleton → rhythm test → mature skeleton |
-| `novel-ascend` | Ascending pipeline |
-| `novel-descend` | Descending pipeline |
-| `novel-calibrate` | Calibration: boundary and taboo checks, redo on failure |
-| `novel-dissect` | Dissection back into skeleton / cartilage / flesh |
-| `novel-ai-judge` | AI-tell judge agent: one agent, one feature, judges only |
-| `novel-deai` | De-AI-tone rewriter: fixes what the judge found, one feature at a time |
-| `novel-vote` | Weighted blind review and the score ledger |
-| `novel-logic` | Logic audit: four contradiction classes and six mandatory checks |
-| `novel-closeout` | Chapter close-out: update ledgers, aggregate scores |
-| `novel-panel` | Panel roster: each agent's role, inputs, outputs and blind rules |
-| `novel-pipeline` | Overall orchestration |
-
-## Install
-
-From a Git marketplace:
+A read-only script renders the project into a single HTML overview: **rows are lines**, and the horizontal axis toggles between writing order and story time — so a block that goes back in time visibly moves left. Block width is proportional to estimated length, so the spacing *is* the rhythm. Each thread is drawn as an arc whose midpoint is clickable; each block opens its own `.md`.
 
 ```sh
-codex plugin marketplace add UzQueen-001/novel-workshop
-codex plugin add novel-workshop@novel-local
+node scripts/viz.mjs <project> [--open]   # writes <project>/骨架总览.html
+node scripts/init-project.mjs <project>   # scaffold an empty project
 ```
 
-From a local path:
+The renderer never writes back: content is edited in the files, and the diagram is only a reading of them.
 
-```sh
-codex plugin marketplace add /path/to/novel-workshop
-codex plugin add novel-workshop@novel-local
-```
-
-## Quick Start
-
-Simply invoke the plugin — no input preparation required. It introduces the workflow and its approval points, then asks where to begin.
-
-With existing setting and characters, enter at the preparation stage; with an outline and a chapter to advance, enter at anatomy; to clean AI tells from existing text, invoke the judge and rewriter skills directly.
-
-The opening is not a question you must answer on the spot: state your writing requirement after reading the introduction, and the plugin routes by the content of your next message. Changes to the skill library apply to subsequent input.
-
-## Workspace Layout
-
-All files written into the workspace are `.txt`. A single chapter runs to thousands of characters, and with dissection drafts and ledgers on top, Markdown rendering causes noticeable stalls; plain text is cheaper to open and search. Skill manifests remain `.md`, as required by the platform.
+## Layout
 
 ```text
-<work directory>/
-├── 00_台账/   question log, open issues, foreshadow ledger, taboos, score ledger, review dimensions
-├── 01_世界/   world rules, core conflict
-├── 02_人物/   character sheets, character state
-├── 03_规划/   long-term plan
-├── 04_章节/   per-chapter artifacts (skeleton, both drafts, cross drafts, dissections, stitched draft, final text)
-└── 05_文风/   style sample, reference bibliography, reference passages
+<project>/
+├── 骨架/     line index, writing-order table, blocks/B01_*.md
+├── 角色/     <name>/{card.md, blocks/, knowledge-boundary.md, changes/}
+├── 场景/     location index and cards
+├── 关系/     <A>_to_<B>.md      A→B and B→A stored separately
+├── 线索/     threads
+├── 世界观/   rules, glossary, taboos, open questions
+├── 正文/     chapter text (.txt)
+└── _检索/    author decisions, task queues
 ```
-
-Directory names are literal and kept in Chinese, matching the paths referenced throughout the skills.
-
-Obsidian is optional. The plugin asks about it only when it detects an existing installation, and never prompts otherwise; nothing in the workflow depends on Obsidian features. Because workspace files are `.txt`, Obsidian wikilinks are not used.
-
-## Design Constraints
-
-- **Information preservation** — rewriting may not add or remove facts, numbers, dates, quotes, sources, causality or hedges. Every content word must be traceable to the source.
-- **Whitelist rewriting** — de-AI-tone handles only the forms listed in the feature cards; unmatched text is preserved word for word. The cards ship with a counter-list of characteristics that measured analysis does not support and that must not trigger edits.
-- **Separation of duties** — judging and rewriting belong to different agents; for any given feature, the judge and the rewriter must not be the same agent.
-- **Blind review** — reviewers exchange neither scores nor comments, and candidates are stripped of source labels; results are aggregated only once complete.
-- **Approval points** — creating directories, writing outside the workspace, network retrieval, each layer of setting, skeleton confirmation and irreversible plot moves all require the author's confirmation first.
 
 ## Status and Limitations
 
-- All skills pass structural validation and the plugin manifest passes validation; **end-to-end execution has not yet been verified**. Uncovered branches during real runs are expected.
-- The two pipelines currently run sequentially. This is a resource consideration only: inputs and rules are unchanged, and execution order does not affect comparability.
-- The measured AI-tell data comes from third-party corpus research and has not been independently reproduced in this repository.
+- Specification and renderer are settled and working; **not yet exercised end-to-end on a full novel**.
+- Checkers are currently a written rubric and output format executed by the agent, **not standalone scripts**.
+- Absolute time depends on the calendar defined by the world module; ordering currently uses a numeric time key.
+
+---
+
+# 2. novel-workshop (legacy)
+
+Structured segments serve as the minimum unit of comparison; two independent drafting pipelines, cross-recombination and weighted blind review converge each chapter into a final text. Version 0.1.5.
+
+**Three segment types.** Chapter content is decomposed into skeleton (events), cartilage (transitions between nodes) and flesh (setting, action, detail, psychology). The three are never merged; voting and assembly are performed per type.
+
+**The skeleton is a hard boundary.** Both pipelines may only add thickness to the skeleton, never events, characters, locations, settings or information outside it. Test: strip every description — the event sequence must match the skeleton node for node.
+
+**Two independent pipelines.** The ascending pipeline expands prose directly from the skeleton, layering space, character, relationship and language. The descending pipeline converts the chapter into script form and progressively restores it to prose. Neither reads the other's text while running.
+
+**Cross-recombination.** Both drafts are dissected and their skeletons exchanged, producing four versions. Aligned by segment type, each type yields four candidates.
+
+**Weighted blind review.** Candidates are stripped of source labels and shuffled before blind reviewers score them across eight dimensions; weighted totals select the best segment of each type.
+
+**Score ledger.** Dimension scores and weighted totals for each pipeline at each step are recorded, enabling cross-chapter comparison and regression checks.
+
+```text
+Opening → Onboarding → Preparation → Anatomy (spine → juvenile skeleton → rhythm test → mature skeleton)
+   ↓
+   ─┬→ Ascending pipeline → Product 1 ─┐
+    └→ Descending pipeline → Product 2 ─┤→ Calibration
+                                        ↓
+              Cross-recombination → Calibration → Four dissections → per-segment blind review
+                                        ↓
+                    Stitched draft → re-inject into both pipelines → second vote → final text
+```
+
+The descending pipeline is the main body: dialogue script → action script → staged script → draft → final wording, with a logic and continuity calibration between consecutive steps.
+
+Skills: `novel-start`, `novel-onboarding`, `novel-prep`, `novel-anatomy`, `novel-ascend`, `novel-descend`, `novel-calibrate`, `novel-dissect`, `novel-ai-judge`, `novel-deai`, `novel-vote`, `novel-logic`, `novel-closeout`, `novel-panel`, `novel-pipeline`, `novel-taboo`.
+
+Workspace files are all `.txt` (a chapter plus its dissection drafts and ledgers makes Markdown rendering stall); skill manifests remain `.md`. Obsidian is optional and never required.
+
+## Install
+
+```sh
+codex plugin marketplace add UzQueen-001/novel-workshop
+codex plugin add novel-blocks@novel-local      # current
+codex plugin add novel-workshop@novel-local    # legacy, optional
+```
 
 ## Credits and License
 
